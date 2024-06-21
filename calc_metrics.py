@@ -19,9 +19,10 @@ def calc_metrics(processed_df):
     expectancy = processed_df['PnL'].mean()
 
     # Sharpe Ratio
-    risk_free_rate = 0.01  # 假設無風險利率為1%
+    pnl_mean = processed_df['PnL'].mean()
     pnl_std = processed_df['PnL'].std()
-    sharpe_ratio = (processed_df['PnL'].mean() - risk_free_rate) / pnl_std * np.sqrt(total_trades) if pnl_std > 0 else np.nan
+    annual_factor = np.sqrt(365)
+    sharpe_ratio = pnl_mean / pnl_std * annual_factor if pnl_std > 0 else np.nan
 
     # Final Balance
     final_balance = processed_df['Balance'].iloc[-2] if len(processed_df) > 1 else np.nan
