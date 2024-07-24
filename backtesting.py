@@ -1,6 +1,6 @@
 def backtesting(df, directions, threshold, atr_mode, chart_type):
     balance = 100000
-    signals = [0] * len(df)  # 初始为长度为 len(df) 的列表，最终值为 0
+    signals = [0] * len(df)
     buy_signals = [0] * len(df)
     sell_signals = [0] * len(df)
     buy_position = [None] * len(df)
@@ -36,7 +36,7 @@ def backtesting(df, directions, threshold, atr_mode, chart_type):
             buy_position[i] = buy_position[i-1]
             sell_position[i] = sell_position[i-1]
 
-        # 多单停利&止损的条件
+        # 多單停利止損条件
         if buy_position[i] == 'long':
             # take profit
             if df.at[i, 'high'] >= entry_price + 3 * df.at[i, 'atr']:
@@ -46,7 +46,6 @@ def backtesting(df, directions, threshold, atr_mode, chart_type):
                 exit_price = entry_price + 3 * df.at[i, 'atr']
                 exit_prices[i] = exit_price
                 pnl[i] = take_profit
-            # take profit 保利润(出现trend转角)
             elif directions[i+1] != 'up' and entry_price <= df.at[i, 'close']:
                 take_profit = (df.at[i, 'close'] - entry_price) * lot
                 balance += take_profit
@@ -54,7 +53,6 @@ def backtesting(df, directions, threshold, atr_mode, chart_type):
                 exit_price = df.at[i, 'close']
                 exit_prices[i] = exit_price
                 pnl[i] = take_profit
-                # 出现trend 轉空单
                 signals[i+1] = -1
                 sell_signals[i+1] = 1
                 entry_price = df.at[i+1, 'close']
@@ -84,7 +82,7 @@ def backtesting(df, directions, threshold, atr_mode, chart_type):
                 sell_position[i+1] = 'short'
             else:
                 continue
-        # 空单停利&止损的条件
+        # 空單停利止損條件
         if sell_position[i] == 'short':
             # take profit
             if df.at[i, 'low'] <= entry_price - 3 * df.at[i, 'atr']:
@@ -116,7 +114,6 @@ def backtesting(df, directions, threshold, atr_mode, chart_type):
                 exit_price = df.at[i, 'close']
                 exit_prices[i] = exit_price
                 pnl[i] = - stop_loss
-            # stop loss 出现down 轉 up
             elif directions[i+1] != 'down' and entry_price <= df.at[i, 'close']:
                 stop_loss = (df.at[i, 'close'] - entry_price) * lot
                 balance -= stop_loss
@@ -124,7 +121,6 @@ def backtesting(df, directions, threshold, atr_mode, chart_type):
                 exit_price = df.at[i, 'close']
                 exit_prices[i] = exit_price
                 pnl[i] = - stop_loss
-                # 出现trend 轉多单
                 signals[i+1] = 1
                 buy_signals[i+1] = 1
                 entry_price = df.at[i+1, 'close']
